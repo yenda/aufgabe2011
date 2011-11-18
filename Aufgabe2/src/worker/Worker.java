@@ -3,8 +3,12 @@ package worker;
 import static akka.actor.Actors.remote;
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
+//import static akka.actor.Actors.poisonPill;
+
 import java.math.BigInteger;
 import java.util.Random;
+
+import javax.swing.JOptionPane;
 
 public class Worker extends UntypedActor {
 	private static int idGenerator = 0;
@@ -15,11 +19,32 @@ public class Worker extends UntypedActor {
 		// instance of the actuator for remote calls from a client!
 		getContext().setId(idGenerator + "");
 		actorId = idGenerator;
-		System.out.println("Aktor wurde erstellt: " + idGenerator);
 		idGenerator++;
+		System.out.println("Actor is now running");
 	}
 
 	private ActorRef master;
+
+	// message handler
+	public void onReceive(Object message) {
+		if (message instanceof CalculateMessage) {
+			// The sender is determined at the first call
+			this.master = getContext().getSender().get();
+			CalculateMessage calculateMessage = (CalculateMessage) message;
+			BigInteger result = calculate(calculateMessage.getN());
+			ResultMessage resultMessage = new ResultMessage(result);
+			// Send the result to the master
+			master.tell(resultMessage);
+			// Through this.getContext().tell([Nachricht]) the actor can
+			// send a message to itself. In this case it will be a 
+			// poisonPill. When the actor receive this poisonPill it
+			// terminates and postStop() is called
+		}
+		else {
+			throw new IllegalArgumentException("Unknown message [" + message
+					+ "]");
+		}
+	}
 	
 	/**
 	 * Takes 2 BigIntegers and return the biggest common divisor.
@@ -69,26 +94,6 @@ public class Worker extends UntypedActor {
 		return N;
 	}
 
-	// message handler
-	public void onReceive(Object message) {
-		if (message instanceof CalculateMessage) {
-			// The sender is determined at the first call
-			this.master = getContext().getSender().get();
-			CalculateMessage calculateMessage = (CalculateMessage) message;
-			BigInteger result = calculate(calculateMessage.getN());
-			ResultMessage resultMessage = new ResultMessage(result);
-			// Send the result to the master
-			master.tell(resultMessage);
-			// Through this.getContext().tell([Nachricht]) the actor can
-			// send a message to itself. In this case it will be a 
-			// poisonPill. When the actor receive this poisonPill it
-			// terminates and postStop() is called
-		} else {
-			throw new IllegalArgumentException("Unknown message [" + message
-					+ "]");
-		}
-	}
-
 	@Override
 	/**
 	 * Stop the worker
@@ -97,8 +102,10 @@ public class Worker extends UntypedActor {
 		System.out.println("Aktor wurde beendet: " + this.actorId);
 		super.postStop();
 	}
-
+	
 	public static void main(String[] args) throws Exception {
-		remote().start("localhost", 2552);
+		int port = Integer.parseInt(JOptionPane.showInputDialog(null, "Choose Port :", "Launcher StartUp", JOptionPane.QUESTION_MESSAGE));
+		remote().start("localhost", port);
+		
 	}
 }
