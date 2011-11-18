@@ -1,6 +1,5 @@
 package worker;
 
-import static akka.actor.Actors.poisonPill;
 import static akka.actor.Actors.remote;
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
