@@ -99,6 +99,6 @@ public class Worker extends UntypedActor {
 	}
 
 	public static void main(String[] args) throws Exception {
-		remote().start("workerserver", 2552);
+		remote().start("localhost", 2552);
 	}
 }
