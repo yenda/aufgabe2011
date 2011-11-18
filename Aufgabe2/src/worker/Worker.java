@@ -68,6 +68,7 @@ public class Worker extends UntypedActor {
 	
 	private BigInteger calc(BigInteger N, BigInteger a){
 		Random rand = new Random();
+		MillerRabin test = new MillerRabin();
 			
 		BigInteger x;
 		do {
@@ -86,6 +87,13 @@ public class Worker extends UntypedActor {
 			d=d.abs();
 			p=ggt(d,N);
 		}while(p.compareTo(BigInteger.ONE) == 0);
+		
+		if( p.mod(new BigInteger("2")) == BigInteger.ZERO){
+			return new BigInteger("2");
+		}
+		if(!test.miller_rabin(p, 10)){
+			p=calc(p, new BigInteger( N.bitLength(), rand));
+		}
 			
 		return p;
 }
