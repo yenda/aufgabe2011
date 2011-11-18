@@ -3,10 +3,10 @@ package worker;
 import static akka.actor.Actors.remote;
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
+import java.security.SecureRandom;
 //import static akka.actor.Actors.poisonPill;
-
 import java.math.BigInteger;
-import java.util.Random;
+
 
 import javax.swing.JOptionPane;
 
@@ -52,23 +52,10 @@ public class Worker extends UntypedActor {
 	 * @param e : BigInteger
 	 * @return BigInteger
 	 */
-	private BigInteger ggt(BigInteger d, BigInteger e ){
-		if(d.compareTo(BigInteger.ZERO) != 0){
-			while(e.compareTo(BigInteger.ZERO) != 0){
-				if(d.compareTo(e) > 0)
-					d=d.subtract(e);
-				else
-					e=e.subtract(d);
-			}
-			return d;
-		}else{
-			return e;
-		}
-	}
-	
-	private BigInteger calc(BigInteger N, BigInteger a){
-		Random rand = new Random();
-		MillerRabin test = new MillerRabin();
+
+	private BigInteger calculate(BigInteger N){
+		SecureRandom rand = new SecureRandom();
+		BigInteger a = new BigInteger( N.bitLength(), rand);
 			
 		BigInteger x;
 		do {
@@ -84,23 +71,16 @@ public class Worker extends UntypedActor {
 			y=((y.pow(2)).add(a)).mod(N);
 			y=((y.pow(2)).add(a)).mod(N);
 			d=(y.subtract(x)).mod(N);
-			d=d.abs();
-			p=ggt(d,N);
+			p=d.gcd(N);
 		}while(p.compareTo(BigInteger.ONE) == 0);
 		
-		if( p.mod(new BigInteger("2")) == BigInteger.ZERO){
-			return new BigInteger("2");
-		}
-		if(!test.miller_rabin(p, 10)){
-			p=calc(p, new BigInteger( N.bitLength(), rand));
+		if(!p.isProbablePrime(20)){
+			p=calculate(p);
 		}
 			
 		return p;
 }
 
-	private BigInteger calculate(BigInteger N) {
-		return N;
-	}
 
 	@Override
 	/**
