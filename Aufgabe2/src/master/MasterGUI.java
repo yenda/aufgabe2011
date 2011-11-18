@@ -76,7 +76,7 @@ public class MasterGUI {
 		txtLocalhost.setColumns(10);
 		
 		textField_WorkerPort = new JTextField();
-		textField_WorkerPort.setText("2553");
+		textField_WorkerPort.setText("2555");
 		textField_WorkerPort.setBounds(130, 22, 166, 20);
 		frame.getContentPane().add(textField_WorkerPort);
 		textField_WorkerPort.setColumns(10);

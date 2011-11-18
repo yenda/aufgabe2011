@@ -3,10 +3,10 @@ package master;
 import java.awt.EventQueue;
 import static akka.actor.Actors.poisonPill;
 import static akka.actor.Actors.remote;
-import akka.actor.ActorRef; import akka.actor.UntypedActor;
+import akka.actor.ActorRef; 
+import akka.actor.UntypedActor;
 import akka.remoteinterface.RemoteServerModule;
 import worker.*;
-import launcher.*;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -16,6 +16,9 @@ import javax.swing.JOptionPane;
 public class Master extends UntypedActor {
 	static RemoteServerModule remoteSupport;
 	private static ArrayList<WorkerData> workerList = new ArrayList<WorkerData>();
+	private static ArrayList<BigInteger> factorList = new ArrayList<BigInteger>();
+	private static BigInteger N;
+	private static BigInteger current;
 	private static MasterGUI masterGUI;
 	private static ActorRef master;
 	
@@ -28,22 +31,28 @@ public class Master extends UntypedActor {
 			}
 		} 
 		else if (message instanceof ResultMessage) {
-			System.out.println(((ResultMessage) message).getResult());
+			//stop all the workers
+			BigInteger result = ((ResultMessage) message).getResult();
+			factorList.add(result);
+			Master.current = Master.current.divide(result);
+			if (Master.current.isProbablePrime(20)){
+				//solution found	
+			}
+			CalculateMessage calculate = new CalculateMessage(Master.current);
+			for(WorkerData worker : workerList){
+				worker.getWorkerRef().tell(calculate,master);
+			}
+			
 		} 
-		else if (message instanceof AddWorkerMessage) {
-			AddWorkerMessage addWorkerMessage = (AddWorkerMessage) message;
-			workerList.add(new WorkerData(addWorkerMessage.getWorkerRef(), addWorkerMessage.getAddress(), addWorkerMessage.getPort()));
-			masterGUI.refreshTextPaneWorkerList(workerList);
-		}
 		else {
 			throw new IllegalArgumentException("Unknown message [" + message + "]");
 		}
 	}
 	
 	public static void addWorker (String address, int port){
-		ActorRef launcher = remote().actorFor(Launcher.class.getName(),address, 2552);
-		AddWorkerMessage addWorker = new AddWorkerMessage(address,port);
-		launcher.tell(addWorker, master);
+		ActorRef worker = remote().actorFor(Worker.class.getName(),address, port);
+		workerList.add(new WorkerData(worker, address, port));
+		masterGUI.refreshTextPaneWorkerList(workerList);
 	}
 	
 	public static void removeWorker (int ID){
@@ -60,17 +69,20 @@ public class Master extends UntypedActor {
 	}
 	
 	public static void calculateMessage (BigInteger N){
+		Master.N = N;
+		Master.current = N;
 		CalculateMessage calculate = new CalculateMessage(N);
 		for(WorkerData worker : workerList){
-			worker.getWorkerRef().tell(calculate);
+			worker.getWorkerRef().tell(calculate,master);
 		}
+		
 		
 	}
 	public static void main(String[] args) {
 		// The Client must also be started as a remote actuator 
 		// to be able to receive messages from the worker later
-		remoteSupport = remote().start("localhost", 2553); 
-		master = remote().actorFor(Master.class.getName(),"localhost", 2553);
+		remoteSupport = remote().start("localhost", 2552); 
+		master = remote().actorFor(Master.class.getName(),"localhost", 2552);
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
