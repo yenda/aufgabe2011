@@ -3,7 +3,6 @@ package master;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JButton;
@@ -15,6 +14,7 @@ import java.awt.event.ActionEvent;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import javax.swing.JScrollPane;
 
 public class MasterGUI {
 
@@ -131,6 +131,7 @@ public class MasterGUI {
 		frame.getContentPane().add(lblDisplayNumberOfCycles);
 		
 		textPaneWorkerID = new JTextPane();
+		textPaneWorkerID.setEditable(false);
 		textPaneWorkerID.setBounds(310, 72, 43, 135);
 		frame.getContentPane().add(textPaneWorkerID);
 		
@@ -163,10 +164,12 @@ public class MasterGUI {
 		frame.getContentPane().add(lblNbOfWorkers);
 		
 		textPaneWorkerAddress = new JTextPane();
+		textPaneWorkerAddress.setEditable(false);
 		textPaneWorkerAddress.setBounds(363, 72, 155, 135);
 		frame.getContentPane().add(textPaneWorkerAddress);
 		
 		textPaneWorkerPort = new JTextPane();
+		textPaneWorkerPort.setEditable(false);
 		textPaneWorkerPort.setBounds(528, 72, 61, 137);
 		frame.getContentPane().add(textPaneWorkerPort);
 		
@@ -182,14 +185,15 @@ public class MasterGUI {
 		lblHost.setBounds(528, 50, 46, 14);
 		frame.getContentPane().add(lblHost);
 		
-		textAreaDisplayResults = new JTextArea();
-		
-		JScrollPane scrollPane = new JScrollPane(textAreaDisplayResults);
-		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollPane.add(textAreaDisplayResults);
-		scrollPane.setBounds(10, 266, 579, 85);
-		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(10, 258, 579, 93);
 		frame.getContentPane().add(scrollPane);
+		
+		textAreaDisplayResults = new JTextArea();
+		textAreaDisplayResults.setLineWrap(true);
+		textAreaDisplayResults.setEditable(false);
+		scrollPane.setViewportView(textAreaDisplayResults);
+		
 		frame.setVisible(true);
 	}
 	
