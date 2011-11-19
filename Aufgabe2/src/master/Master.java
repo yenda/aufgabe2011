@@ -3,12 +3,13 @@ package master;
 import java.awt.EventQueue;
 import static akka.actor.Actors.poisonPill;
 import static akka.actor.Actors.remote;
-import akka.actor.ActorRef; 
+import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 import akka.remoteinterface.RemoteServerModule;
 import worker.*;
 
 import java.math.BigInteger;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
@@ -20,69 +21,75 @@ public class Master extends UntypedActor {
 	private static BigInteger N;
 	private static MasterGUI masterGUI;
 	private static ActorRef master;
-	
+
 	@Override
 	public void onReceive(Object message) throws Exception {
-		if (message instanceof CalculateMessage) {
-			CalculateMessage calculate = (CalculateMessage) message;
-			for(WorkerData worker : workerList){
-				worker.getWorkerRef().tell(calculate, master);
-			}
-		} 
-		else if (message instanceof ResultMessage) {
-			//stop all the workers
+		if (message instanceof ResultMessage) {
+			// stop all the workers
 			BigInteger result = ((ResultMessage) message).getResult();
 			factorList.add(result);
-			Master.N = Master.N.divide(result);
-			if ((Master.N.compareTo(BigInteger.ONE) == 0) || (Master.N.isProbablePrime(20))){
-				factorList.add(Master.N);
+			if ((Master.N.compareTo(result) != 0)) {
+				Master.N = Master.N.divide(result);
+				Master.calculateMessage(Master.N);
+			} else {
 				masterGUI.displayResults(factorList, 0l, 0l, 0);
 				factorList = new ArrayList<BigInteger>();
 			}
-			else{
-				CalculateMessage calculate = new CalculateMessage(Master.N);
-				for(WorkerData worker : workerList){
-					worker.getWorkerRef().tell(calculate,master);
-				}
-			}
-			
-		} 
-		else {
-			throw new IllegalArgumentException("Unknown message [" + message + "]");
+		} else {
+			throw new IllegalArgumentException("Unknown message [" + message
+					+ "]");
 		}
 	}
-	
-	public static void addWorker (String address, int port){
-		ActorRef worker = remote().actorFor(Worker.class.getName(),address, port);
-		workerList.add(new WorkerData(worker, address, port));
-		masterGUI.refreshTextPaneWorkerList(workerList);
+
+	public static void addWorker(String address, int port) {
+		ActorRef worker = remote().actorFor(Worker.class.getName(), address,
+				port);
+		try {
+			TestConnectionMessage testConnexion = new TestConnectionMessage();
+			worker.tell(testConnexion, master);
+			workerList.add(new WorkerData(worker, address, port));
+			masterGUI.refreshTextPaneWorkerList(workerList);
+		} catch (Exception e) {
+			//Shut down the connection
+			remote().shutdownClientConnection(new InetSocketAddress(address, port));
+			JOptionPane.showMessageDialog(null,
+					"Connexion to the worker failed", "Error",
+					JOptionPane.ERROR_MESSAGE);
+		}
 	}
-	
-	public static void removeWorker (int ID){
-		try{
-			//Terminates the worker
+
+	public static void removeWorker(int ID) {
+		try {
+			// Terminates the worker
 			workerList.get(ID).getWorkerRef().tell(poisonPill());
-			//Removes it from the list of workers
+			// Removes it from the list of workers
 			workerList.remove(ID);
 			masterGUI.refreshTextPaneWorkerList(workerList);
-		} 
-		catch(Exception e){
-			JOptionPane.showMessageDialog(null, "The ID doesn't match any Worker", "Error", JOptionPane.ERROR_MESSAGE);
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null,
+					"The ID doesn't match any Worker", "Error",
+					JOptionPane.ERROR_MESSAGE);
 		}
 	}
-	
-	public static void calculateMessage (BigInteger N){
+
+	public static void calculateMessage(BigInteger N) {
 		Master.N = N;
-		masterGUI.cleanResults();
-		ResultMessage result = new ResultMessage(N);		
-		master.tell(result,master);	
+		if (Master.N.compareTo(BigInteger.ONE) == 0) {
+			ResultMessage result = new ResultMessage(N);
+			master.tell(result, master);
+		} else {
+			CalculateMessage calculate = new CalculateMessage(Master.N);
+			for (WorkerData worker : workerList) {
+				worker.getWorkerRef().tell(calculate, master);
+			}
+		}
 	}
-	
+
 	public static void main(String[] args) {
-		// The Client must also be started as a remote actuator 
+		// The Client must also be started as a remote actuator
 		// to be able to receive messages from the worker later
-		remoteSupport = remote().start("localhost", 2552); 
-		master = remote().actorFor(Master.class.getName(),"localhost", 2552);
+		remoteSupport = remote().start("localhost", 2552);
+		master = remote().actorFor(Master.class.getName(), "localhost", 2552);
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
