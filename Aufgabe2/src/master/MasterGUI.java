@@ -31,6 +31,9 @@ public class MasterGUI {
 	private JLabel lblDisplayExecutionTime;
 	private JLabel lblDisplayNumberOfCycles;
 	private JLabel lblDisplayCPUExecutionTime;
+	private JButton btnFactoriseN;
+	private JButton btnAddWorker;
+	private JButton btnDeleteWorker;
 
 	/**
 	 * Create the application.
@@ -59,7 +62,7 @@ public class MasterGUI {
 		lblWorkerPort.setBounds(10, 25, 110, 14);
 		frame.getContentPane().add(lblWorkerPort);
 		
-		JButton btnAddWorker = new JButton("Add Worker");
+		btnAddWorker = new JButton("Add Worker");
 		btnAddWorker.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String address = txtLocalhost.getText();
@@ -87,7 +90,7 @@ public class MasterGUI {
 		frame.getContentPane().add(textField_WorkerPort);
 		textField_WorkerPort.setColumns(10);
 		
-		JButton btnFactoriseN = new JButton("Factorise N");
+		btnFactoriseN = new JButton("Factorise N");
 		btnFactoriseN.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				BigInteger N = new BigInteger(textField_N.getText());
@@ -145,7 +148,7 @@ public class MasterGUI {
 		frame.getContentPane().add(textFieldWorkerToDelete);
 		textFieldWorkerToDelete.setColumns(10);
 		
-		JButton btnDeleteWorker = new JButton("Delete Worker");
+		btnDeleteWorker = new JButton("Delete Worker");
 		btnDeleteWorker.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int ID = Integer.parseInt(textFieldWorkerToDelete.getText());
@@ -233,6 +236,12 @@ public class MasterGUI {
     	lblDisplayExecutionTime.setText(contentTime);
     	lblDisplayNumberOfCycles.setText(contentCycles);
     	textAreaDisplayResults.setText(contentResult);
+    }
+    
+    public void changeStateButton(boolean state){
+    	btnAddWorker.setEnabled(state);
+    	btnFactoriseN.setEnabled(state);
+    	btnDeleteWorker.setEnabled(state);
     }
     
     public void cleanResults(){

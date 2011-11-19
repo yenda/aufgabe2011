@@ -32,6 +32,7 @@ public class Master extends UntypedActor {
 				Master.N = Master.N.divide(result);
 				Master.calculateMessage(Master.N);
 			} else {
+				masterGUI.changeStateButton(true);
 				masterGUI.displayResults(factorList, 0l, 0l, 0);
 				factorList = new ArrayList<BigInteger>();
 			}
@@ -73,6 +74,7 @@ public class Master extends UntypedActor {
 	}
 
 	public static void calculateMessage(BigInteger N) {
+		masterGUI.changeStateButton(false);
 		Master.N = N;
 		if (Master.N.compareTo(BigInteger.ONE) == 0) {
 			ResultMessage result = new ResultMessage(N);

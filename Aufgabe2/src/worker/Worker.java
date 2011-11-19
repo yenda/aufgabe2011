@@ -12,8 +12,9 @@ import javax.swing.JOptionPane;
 
 public class Worker extends UntypedActor {
 	private static int idGenerator = 0;
-	private static int Rho = 0;
+	private int Rho = 0;
 	private int actorId;
+	private boolean found = false;
 	
 
 	public Worker() {
@@ -40,8 +41,9 @@ public class Worker extends UntypedActor {
 			// send a message to itself. In this case it will be a
 			// poisonPill. When the actor receive this poisonPill it
 			// terminates and postStop() is called
+		} else if (message instanceof GetStatsMessage){
+			
 		} else if (message instanceof TestConnectionMessage) {
-			System.out.println("Actor " + idGenerator + " is now connected");
 		} else {
 			throw new IllegalArgumentException("Unknown message [" + message
 					+ "]");
@@ -58,7 +60,7 @@ public class Worker extends UntypedActor {
 	 * @return BigInteger
 	 */
 
-	private static BigInteger calculate(BigInteger N) {
+	private BigInteger calculate(BigInteger N) {
 		// if 2 is a factor of N it's immediately returned
 		if(N.mod(new BigInteger("2")).compareTo(BigInteger.ZERO) == 0) return new BigInteger("2");
 			
