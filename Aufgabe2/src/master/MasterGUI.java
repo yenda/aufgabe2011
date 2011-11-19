@@ -13,6 +13,9 @@ import java.awt.event.ActionEvent;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import javax.swing.JScrollBar;
+import java.awt.event.AdjustmentListener;
+import java.awt.event.AdjustmentEvent;
 
 public class MasterGUI {
 
@@ -24,8 +27,8 @@ public class MasterGUI {
 	private JTextPane textPaneWorkerID;
 	private JTextPane textPaneWorkerAddress;
 	private JTextPane textPaneWorkerPort;
+	private JTextPane textPaneDisplayResults;
 	private JLabel lblNbOfWorkers;
-	private JLabel lblDisplayResults;
 	private JLabel lblDisplayExecutionTime;
 	private JLabel lblDisplayNumberOfCycles;
 	private JLabel lblDisplayCPUExecutionTime;
@@ -37,7 +40,7 @@ public class MasterGUI {
 		frame = new JFrame();
 		frame.setTitle("Distributed Prime Number Factorisation Master");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setBounds(100, 100, 600, 300);
+		frame.setBounds(100, 100, 615, 400);
 		frame.getContentPane().setLayout(null);
 		
 		JLabel lblN = new JLabel("N:");
@@ -101,39 +104,35 @@ public class MasterGUI {
 		
 		JLabel lblResults = new JLabel("Results :");
 		lblResults.setFont(lblResults.getFont().deriveFont(lblResults.getFont().getStyle() | Font.BOLD));
-		lblResults.setBounds(10, 168, 85, 14);
+		lblResults.setBounds(10, 243, 110, 14);
 		frame.getContentPane().add(lblResults);
 		
-		JLabel lblCPUExecutionTime = new JLabel("CPU excecution time :");
-		lblCPUExecutionTime.setBounds(10, 193, 138, 14);
+		JLabel lblCPUExecutionTime = new JLabel("CPU time :");
+		lblCPUExecutionTime.setBounds(10, 168, 110, 14);
 		frame.getContentPane().add(lblCPUExecutionTime);
 		
 		JLabel lblExecutionTime = new JLabel("Execution time :");
-		lblExecutionTime.setBounds(10, 216, 138, 14);
+		lblExecutionTime.setBounds(10, 193, 110, 14);
 		frame.getContentPane().add(lblExecutionTime);
 		
 		JLabel lblNbOfCycles = new JLabel("Number of cycles :");
-		lblNbOfCycles.setBounds(10, 241, 138, 14);
+		lblNbOfCycles.setBounds(10, 218, 110, 14);
 		frame.getContentPane().add(lblNbOfCycles);
 		
-		lblDisplayResults = new JLabel("");
-		lblDisplayResults.setBounds(105, 168, 191, 14);
-		frame.getContentPane().add(lblDisplayResults);
-		
 		lblDisplayCPUExecutionTime = new JLabel("");
-		lblDisplayCPUExecutionTime.setBounds(141, 193, 155, 14);
+		lblDisplayCPUExecutionTime.setBounds(115, 168, 145, 14);
 		frame.getContentPane().add(lblDisplayCPUExecutionTime);
 		
 		lblDisplayExecutionTime = new JLabel("");
-		lblDisplayExecutionTime.setBounds(141, 216, 155, 14);
+		lblDisplayExecutionTime.setBounds(125, 193, 145, 14);
 		frame.getContentPane().add(lblDisplayExecutionTime);
 		
 		lblDisplayNumberOfCycles = new JLabel("");
-		lblDisplayNumberOfCycles.setBounds(141, 241, 155, 14);
+		lblDisplayNumberOfCycles.setBounds(115, 218, 145, 14);
 		frame.getContentPane().add(lblDisplayNumberOfCycles);
 		
 		textPaneWorkerID = new JTextPane();
-		textPaneWorkerID.setBounds(306, 72, 30, 135);
+		textPaneWorkerID.setBounds(310, 72, 43, 135);
 		frame.getContentPane().add(textPaneWorkerID);
 		
 		JLabel lblWorkerList = new JLabel("Workers  :");
@@ -165,11 +164,11 @@ public class MasterGUI {
 		frame.getContentPane().add(lblNbOfWorkers);
 		
 		textPaneWorkerAddress = new JTextPane();
-		textPaneWorkerAddress.setBounds(346, 72, 155, 135);
+		textPaneWorkerAddress.setBounds(363, 72, 155, 135);
 		frame.getContentPane().add(textPaneWorkerAddress);
 		
 		textPaneWorkerPort = new JTextPane();
-		textPaneWorkerPort.setBounds(511, 72, 63, 137);
+		textPaneWorkerPort.setBounds(528, 72, 61, 137);
 		frame.getContentPane().add(textPaneWorkerPort);
 		
 		JLabel lblId = new JLabel("ID");
@@ -177,12 +176,16 @@ public class MasterGUI {
 		frame.getContentPane().add(lblId);
 		
 		JLabel lblAddress = new JLabel("Address");
-		lblAddress.setBounds(346, 50, 46, 14);
+		lblAddress.setBounds(363, 50, 46, 14);
 		frame.getContentPane().add(lblAddress);
 		
 		JLabel lblHost = new JLabel("Host");
-		lblHost.setBounds(511, 50, 46, 14);
+		lblHost.setBounds(528, 50, 46, 14);
 		frame.getContentPane().add(lblHost);
+		
+		textPaneDisplayResults = new JTextPane();
+		textPaneDisplayResults.setBounds(10, 266, 579, 85);
+		frame.getContentPane().add(textPaneDisplayResults);
 		frame.setVisible(true);
 	}
 	
@@ -214,19 +217,20 @@ public class MasterGUI {
     	String contentTime = time.toString();
     	String contentCycles = cycles.toString();   	
     	for(BigInteger factor : factorList){
-    		contentResult += factor.toString() + " ";
+    		contentResult += factor.toString() + " * ";
     	}
+    	contentResult = contentResult.substring(0, contentResult.length()-3);
     	
     	lblDisplayCPUExecutionTime.setText(contentCPUTime);
     	lblDisplayExecutionTime.setText(contentTime);
     	lblDisplayNumberOfCycles.setText(contentCycles);
-    	lblDisplayResults.setText(contentResult);
+    	textPaneDisplayResults.setText(contentResult);
     }
     
     public void cleanResults(){
     	lblDisplayCPUExecutionTime.setText("");
     	lblDisplayExecutionTime.setText("");
     	lblDisplayNumberOfCycles.setText("");
-    	lblDisplayResults.setText("");
+    	textPaneDisplayResults.setText("");
     }
 }
