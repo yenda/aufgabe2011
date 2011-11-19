@@ -18,7 +18,6 @@ public class Master extends UntypedActor {
 	private static ArrayList<WorkerData> workerList = new ArrayList<WorkerData>();
 	private static ArrayList<BigInteger> factorList = new ArrayList<BigInteger>();
 	private static BigInteger N;
-	private static BigInteger current;
 	private static MasterGUI masterGUI;
 	private static ActorRef master;
 	
@@ -34,13 +33,17 @@ public class Master extends UntypedActor {
 			//stop all the workers
 			BigInteger result = ((ResultMessage) message).getResult();
 			factorList.add(result);
-			Master.current = Master.current.divide(result);
-			if (Master.current.isProbablePrime(20)){
-				//solution found	
+			Master.N = Master.N.divide(result);
+			if ((Master.N.compareTo(BigInteger.ONE) == 0) || (Master.N.isProbablePrime(20))){
+				factorList.add(Master.N);
+				masterGUI.displayResults(factorList, 0l, 0l, 0);
+				factorList = new ArrayList<BigInteger>();
 			}
-			CalculateMessage calculate = new CalculateMessage(Master.current);
-			for(WorkerData worker : workerList){
-				worker.getWorkerRef().tell(calculate,master);
+			else{
+				CalculateMessage calculate = new CalculateMessage(Master.N);
+				for(WorkerData worker : workerList){
+					worker.getWorkerRef().tell(calculate,master);
+				}
 			}
 			
 		} 
@@ -70,14 +73,11 @@ public class Master extends UntypedActor {
 	
 	public static void calculateMessage (BigInteger N){
 		Master.N = N;
-		Master.current = N;
-		CalculateMessage calculate = new CalculateMessage(N);
-		for(WorkerData worker : workerList){
-			worker.getWorkerRef().tell(calculate,master);
-		}
-		
-		
+		masterGUI.cleanResults();
+		ResultMessage result = new ResultMessage(N);		
+		master.tell(result,master);	
 	}
+	
 	public static void main(String[] args) {
 		// The Client must also be started as a remote actuator 
 		// to be able to receive messages from the worker later

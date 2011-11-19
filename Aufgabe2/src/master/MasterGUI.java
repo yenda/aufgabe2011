@@ -25,6 +25,10 @@ public class MasterGUI {
 	private JTextPane textPaneWorkerAddress;
 	private JTextPane textPaneWorkerPort;
 	private JLabel lblNbOfWorkers;
+	private JLabel lblDisplayResults;
+	private JLabel lblDisplayExecutionTime;
+	private JLabel lblDisplayNumberOfCycles;
+	private JLabel lblDisplayCPUExecutionTime;
 
 	/**
 	 * Create the application.
@@ -76,7 +80,7 @@ public class MasterGUI {
 		txtLocalhost.setColumns(10);
 		
 		textField_WorkerPort = new JTextField();
-		textField_WorkerPort.setText("2555");
+		textField_WorkerPort.setText("2552");
 		textField_WorkerPort.setBounds(130, 22, 166, 20);
 		frame.getContentPane().add(textField_WorkerPort);
 		textField_WorkerPort.setColumns(10);
@@ -112,20 +116,20 @@ public class MasterGUI {
 		lblNbOfCycles.setBounds(10, 241, 138, 14);
 		frame.getContentPane().add(lblNbOfCycles);
 		
-		JLabel lblDisplayResults = new JLabel("");
+		lblDisplayResults = new JLabel("");
 		lblDisplayResults.setBounds(55, 168, 179, 14);
 		frame.getContentPane().add(lblDisplayResults);
 		
-		JLabel lblDisplayCPUExecutionTime = new JLabel("");
-		lblDisplayCPUExecutionTime.setBounds(151, 193, 145, 14);
+		lblDisplayCPUExecutionTime = new JLabel("");
+		lblDisplayCPUExecutionTime.setBounds(168, 193, 128, 14);
 		frame.getContentPane().add(lblDisplayCPUExecutionTime);
 		
-		JLabel lblDisplayExecutionTime = new JLabel("");
-		lblDisplayExecutionTime.setBounds(151, 216, 145, 14);
+		lblDisplayExecutionTime = new JLabel("");
+		lblDisplayExecutionTime.setBounds(168, 216, 128, 14);
 		frame.getContentPane().add(lblDisplayExecutionTime);
 		
-		JLabel lblDisplayNumberOfCycles = new JLabel("");
-		lblDisplayNumberOfCycles.setBounds(151, 241, 145, 14);
+		lblDisplayNumberOfCycles = new JLabel("");
+		lblDisplayNumberOfCycles.setBounds(168, 241, 128, 14);
 		frame.getContentPane().add(lblDisplayNumberOfCycles);
 		
 		textPaneWorkerID = new JTextPane();
@@ -137,6 +141,7 @@ public class MasterGUI {
 		frame.getContentPane().add(lblWorkerList);
 		
 		textFieldWorkerToDelete = new JTextField();
+		textFieldWorkerToDelete.setText("1");
 		textFieldWorkerToDelete.setBounds(390, 213, 46, 20);
 		frame.getContentPane().add(textFieldWorkerToDelete);
 		textFieldWorkerToDelete.setColumns(10);
@@ -186,20 +191,42 @@ public class MasterGUI {
      * @param List<WorkerData> : the list of Workers with the data associated
      */
     public void refreshTextPaneWorkerList(ArrayList<WorkerData> workerList){
-            int i = 1;
-            String contentID = "";
-            String contentAddress = "";
-            String contentPort = "";
-            lblNbOfWorkers.setText(String.valueOf(workerList.size()));
-            
-            for(WorkerData worker : workerList){
-                    contentID += i + "\n";
-                    i++;
-                    contentAddress += worker.getWorkerAddress() + "\n";
-                    contentPort += worker.getWorkerPort() + "\n";                           
-            }
-            textPaneWorkerID.setText(contentID);
-            textPaneWorkerAddress.setText(contentAddress);
-            textPaneWorkerPort.setText(contentPort);
+        int i = 1;
+        String contentID = "";
+        String contentAddress = "";
+        String contentPort = "";
+        lblNbOfWorkers.setText(String.valueOf(workerList.size()));
+        
+        for(WorkerData worker : workerList){
+                contentID += i + "\n";
+                i++;
+                contentAddress += worker.getWorkerAddress() + "\n";
+                contentPort += worker.getWorkerPort() + "\n";                           
+        }
+        textPaneWorkerID.setText(contentID);
+        textPaneWorkerAddress.setText(contentAddress);
+        textPaneWorkerPort.setText(contentPort);
+    }
+    
+    public void displayResults(ArrayList<BigInteger> factorList, Long CPUTime, Long time, Integer cycles){
+    	String contentResult = "";
+    	String contentCPUTime = CPUTime.toString();
+    	String contentTime = time.toString();
+    	String contentCycles = cycles.toString();   	
+    	for(BigInteger factor : factorList){
+    		contentResult += factor.toString() + " ";
+    	}
+    	
+    	lblDisplayCPUExecutionTime.setText(contentCPUTime);
+    	lblDisplayExecutionTime.setText(contentTime);
+    	lblDisplayNumberOfCycles.setText(contentCycles);
+    	lblDisplayResults.setText(contentResult);
+    }
+    
+    public void cleanResults(){
+    	lblDisplayCPUExecutionTime.setText("");
+    	lblDisplayExecutionTime.setText("");
+    	lblDisplayNumberOfCycles.setText("");
+    	lblDisplayResults.setText("");
     }
 }
