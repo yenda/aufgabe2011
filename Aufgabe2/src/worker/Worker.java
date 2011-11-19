@@ -13,6 +13,7 @@ import javax.swing.JOptionPane;
 public class Worker extends UntypedActor {
 	private static int idGenerator = 0;
 	private int Rho = 0;
+	private long CPU = 0;
 	private int actorId;
 	private boolean found = false;
 	
@@ -61,6 +62,7 @@ public class Worker extends UntypedActor {
 	 */
 
 	private BigInteger calculate(BigInteger N) {
+		long CPUcycles = System.nanoTime();
 		// if 2 is a factor of N it's immediately returned
 		if(N.mod(new BigInteger("2")).compareTo(BigInteger.ZERO) == 0) return new BigInteger("2");
 			
@@ -88,6 +90,7 @@ public class Worker extends UntypedActor {
 				p = d.gcd(N);
 			} while (p.compareTo(BigInteger.ONE) == 0);
 		} while (!p.isProbablePrime(20));
+		this.CPU += System.nanoTime() - CPUcycles;
 		return p;
 	}
 

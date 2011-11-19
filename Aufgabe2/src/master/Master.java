@@ -19,6 +19,10 @@ public class Master extends UntypedActor {
 	private static ArrayList<WorkerData> workerList = new ArrayList<WorkerData>();
 	private static ArrayList<BigInteger> factorList = new ArrayList<BigInteger>();
 	private static BigInteger N;
+	private static int statsMessage = 0;
+	private static Long time;
+	private static Long CPUTime = 0l;
+	private static Integer cycles = 0;
 	private static MasterGUI masterGUI;
 	private static ActorRef master;
 
@@ -32,8 +36,17 @@ public class Master extends UntypedActor {
 				Master.N = Master.N.divide(result);
 				Master.calculateMessage(Master.N);
 			} else {
+				
+				
+			}
+		} else if (message instanceof GetStatsMessage){
+			GetStatsMessage stats = ((GetStatsMessage) message);
+			Master.CPUTime+=stats.getCPUTime();
+			Master.cycles+=stats.getCycles();
+			if (statsMessage == Master.factorList.size()){
+				Master.time = System.currentTimeMillis() - Master.time;
 				masterGUI.changeStateButton(true);
-				masterGUI.displayResults(factorList, 0l, 0l, 0);
+				masterGUI.displayResults(Master.factorList, Master.CPUTime, Master.time, Master.cycles);
 				factorList = new ArrayList<BigInteger>();
 			}
 		} else {
@@ -75,6 +88,7 @@ public class Master extends UntypedActor {
 
 	public static void calculateMessage(BigInteger N) {
 		masterGUI.changeStateButton(false);
+		Master.time = System.currentTimeMillis();
 		Master.N = N;
 		if (Master.N.compareTo(BigInteger.ONE) == 0) {
 			ResultMessage result = new ResultMessage(N);
