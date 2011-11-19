@@ -101,7 +101,7 @@ public class MasterGUI {
 		
 		JLabel lblResults = new JLabel("Results :");
 		lblResults.setFont(lblResults.getFont().deriveFont(lblResults.getFont().getStyle() | Font.BOLD));
-		lblResults.setBounds(10, 168, 110, 14);
+		lblResults.setBounds(10, 168, 85, 14);
 		frame.getContentPane().add(lblResults);
 		
 		JLabel lblCPUExecutionTime = new JLabel("CPU excecution time :");
@@ -117,19 +117,19 @@ public class MasterGUI {
 		frame.getContentPane().add(lblNbOfCycles);
 		
 		lblDisplayResults = new JLabel("");
-		lblDisplayResults.setBounds(55, 168, 179, 14);
+		lblDisplayResults.setBounds(105, 168, 191, 14);
 		frame.getContentPane().add(lblDisplayResults);
 		
 		lblDisplayCPUExecutionTime = new JLabel("");
-		lblDisplayCPUExecutionTime.setBounds(168, 193, 128, 14);
+		lblDisplayCPUExecutionTime.setBounds(141, 193, 155, 14);
 		frame.getContentPane().add(lblDisplayCPUExecutionTime);
 		
 		lblDisplayExecutionTime = new JLabel("");
-		lblDisplayExecutionTime.setBounds(168, 216, 128, 14);
+		lblDisplayExecutionTime.setBounds(141, 216, 155, 14);
 		frame.getContentPane().add(lblDisplayExecutionTime);
 		
 		lblDisplayNumberOfCycles = new JLabel("");
-		lblDisplayNumberOfCycles.setBounds(168, 241, 128, 14);
+		lblDisplayNumberOfCycles.setBounds(141, 241, 155, 14);
 		frame.getContentPane().add(lblDisplayNumberOfCycles);
 		
 		textPaneWorkerID = new JTextPane();
