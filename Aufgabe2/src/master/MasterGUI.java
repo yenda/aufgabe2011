@@ -3,6 +3,8 @@ package master;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import java.awt.Font;
@@ -13,9 +15,6 @@ import java.awt.event.ActionEvent;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import javax.swing.JScrollBar;
-import java.awt.event.AdjustmentListener;
-import java.awt.event.AdjustmentEvent;
 
 public class MasterGUI {
 
@@ -27,7 +26,7 @@ public class MasterGUI {
 	private JTextPane textPaneWorkerID;
 	private JTextPane textPaneWorkerAddress;
 	private JTextPane textPaneWorkerPort;
-	private JTextPane textPaneDisplayResults;
+	private JTextArea textAreaDisplayResults;
 	private JLabel lblNbOfWorkers;
 	private JLabel lblDisplayExecutionTime;
 	private JLabel lblDisplayNumberOfCycles;
@@ -120,7 +119,7 @@ public class MasterGUI {
 		frame.getContentPane().add(lblNbOfCycles);
 		
 		lblDisplayCPUExecutionTime = new JLabel("");
-		lblDisplayCPUExecutionTime.setBounds(115, 168, 145, 14);
+		lblDisplayCPUExecutionTime.setBounds(125, 168, 145, 14);
 		frame.getContentPane().add(lblDisplayCPUExecutionTime);
 		
 		lblDisplayExecutionTime = new JLabel("");
@@ -128,7 +127,7 @@ public class MasterGUI {
 		frame.getContentPane().add(lblDisplayExecutionTime);
 		
 		lblDisplayNumberOfCycles = new JLabel("");
-		lblDisplayNumberOfCycles.setBounds(115, 218, 145, 14);
+		lblDisplayNumberOfCycles.setBounds(125, 218, 145, 14);
 		frame.getContentPane().add(lblDisplayNumberOfCycles);
 		
 		textPaneWorkerID = new JTextPane();
@@ -183,9 +182,14 @@ public class MasterGUI {
 		lblHost.setBounds(528, 50, 46, 14);
 		frame.getContentPane().add(lblHost);
 		
-		textPaneDisplayResults = new JTextPane();
-		textPaneDisplayResults.setBounds(10, 266, 579, 85);
-		frame.getContentPane().add(textPaneDisplayResults);
+		textAreaDisplayResults = new JTextArea();
+		
+		JScrollPane scrollPane = new JScrollPane(textAreaDisplayResults);
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPane.add(textAreaDisplayResults);
+		scrollPane.setBounds(10, 266, 579, 85);
+		
+		frame.getContentPane().add(scrollPane);
 		frame.setVisible(true);
 	}
 	
@@ -224,13 +228,13 @@ public class MasterGUI {
     	lblDisplayCPUExecutionTime.setText(contentCPUTime);
     	lblDisplayExecutionTime.setText(contentTime);
     	lblDisplayNumberOfCycles.setText(contentCycles);
-    	textPaneDisplayResults.setText(contentResult);
+    	textAreaDisplayResults.setText(contentResult);
     }
     
     public void cleanResults(){
     	lblDisplayCPUExecutionTime.setText("");
     	lblDisplayExecutionTime.setText("");
     	lblDisplayNumberOfCycles.setText("");
-    	textPaneDisplayResults.setText("");
+    	textAreaDisplayResults.setText("");
     }
 }
