@@ -3,11 +3,6 @@ package worker;
 import static akka.actor.Actors.remote;
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
-
-import java.security.SecureRandom;
-//import static akka.actor.Actors.poisonPill;
-import java.math.BigInteger;
-
 import javax.swing.JOptionPane;
 
 public class Worker extends UntypedActor {
@@ -15,7 +10,8 @@ public class Worker extends UntypedActor {
 	private int Rho = 0;
 	private long CPU = 0;
 	private int actorId;
-	private boolean found = false;
+	private Calculate calculate;
+	private ActorRef master;
 	
 
 	public Worker() {
@@ -23,75 +19,40 @@ public class Worker extends UntypedActor {
 		// instance of the actuator for remote calls from a client!
 		getContext().setId(idGenerator + "");
 		actorId = idGenerator;
-		idGenerator++;		
+		idGenerator++;
+		System.out.println("Worker " + this.actorId + " has been started");
 	}
 
-	private ActorRef master;
-
+	
 	// message handler
-	public void onReceive(Object message) {
+	public void onReceive(Object message) {		
 		if (message instanceof CalculateMessage) {
-			// The sender is determined at the first call
-			this.master = getContext().getSender().get();
+			//Create a thread to find a prime factor of N
+			this.master = getContext().getSender().get();			
 			CalculateMessage calculateMessage = (CalculateMessage) message;
-			BigInteger result = calculate(calculateMessage.getN());
-			ResultMessage resultMessage = new ResultMessage(result);
-			// Send the result to the master
-			master.tell(resultMessage);
-			// Through this.getContext().tell([Nachricht]) the actor can
-			// send a message to itself. In this case it will be a
-			// poisonPill. When the actor receive this poisonPill it
-			// terminates and postStop() is called
+			calculate = new Calculate(calculateMessage.getN(),calculateMessage.getCalculID(),master);
+			Thread thread = new Thread(calculate);
+			thread.start();
 		} else if (message instanceof GetStatsMessage){
-			
+			//Return the calculation stats
+			this.master = getContext().getSender().get();
+			GetStatsMessage stats = new GetStatsMessage(this.CPU,this.Rho);
+			master.tell(stats,getContext());
+			this.CPU = 0l;
+			this.Rho = 0;		
 		} else if (message instanceof TestConnectionMessage) {
+			//Acknowledge the connection try from the master without throwing an exception
+		} else if (message instanceof TerminateMessage){
+			//Send a stop request to the calculation thread if it is running and get the computation stats back
+			if (calculate != null){
+				calculate.requestStop();
+				this.CPU+=calculate.getCPU();
+				this.Rho+=calculate.getRho();
+			}			
 		} else {
 			throw new IllegalArgumentException("Unknown message [" + message
 					+ "]");
 		}
-	}
-
-	/**
-	 * Takes 2 BigIntegers and return the biggest common divisor.
-	 * 
-	 * @param d
-	 *            : BigInteger
-	 * @param e
-	 *            : BigInteger
-	 * @return BigInteger
-	 */
-
-	private BigInteger calculate(BigInteger N) {
-		long CPUcycles = System.nanoTime();
-		// if 2 is a factor of N it's immediately returned
-		if(N.mod(new BigInteger("2")).compareTo(BigInteger.ZERO) == 0) return new BigInteger("2");
-			
-		SecureRandom rand;
-		BigInteger a;
-		BigInteger x;
-		BigInteger y;
-		BigInteger d;
-		BigInteger p = N;
-		do {
-			rand = new SecureRandom();
-			a = new BigInteger(N.bitLength(), rand);
-			do {
-				x = new BigInteger(N.bitLength(), rand);
-			} while (x.compareTo(N) >= 0);
-
-			y = x;
-
-			do {
-				Rho++;
-				x = ((x.pow(2)).add(a)).mod(N);
-				y = ((y.pow(2)).add(a)).mod(N);
-				y = ((y.pow(2)).add(a)).mod(N);
-				d = (y.subtract(x)).mod(N);
-				p = d.gcd(N);
-			} while (p.compareTo(BigInteger.ONE) == 0);
-		} while (!p.isProbablePrime(20));
-		this.CPU += System.nanoTime() - CPUcycles;
-		return p;
 	}
 
 	@Override
@@ -99,7 +60,7 @@ public class Worker extends UntypedActor {
 	 * Stop the worker
 	 */
 	public void postStop() {
-		System.out.println("Aktor wurde beendet: " + this.actorId);
+		System.out.println("Worker " + this.actorId + " has been terminated");
 		super.postStop();
 	}
 

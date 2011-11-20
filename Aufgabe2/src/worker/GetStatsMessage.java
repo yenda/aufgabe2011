@@ -1,6 +1,10 @@
 package worker;
 
-public class GetStatsMessage {
+import java.io.Serializable;
+
+public class GetStatsMessage implements Serializable {
+
+	private static final long serialVersionUID = 2071284281046963431L;
 	private Long CPUTime;
 	private Integer cycles;
 		

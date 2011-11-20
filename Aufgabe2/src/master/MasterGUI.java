@@ -101,6 +101,11 @@ public class MasterGUI {
 		frame.getContentPane().add(btnFactoriseN);
 		
 		JButton btnStopFactorisation = new JButton("Stop factorisation");
+		btnStopFactorisation.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Master.terminate();
+			}
+		});
 		btnStopFactorisation.setBounds(141, 134, 155, 23);
 		frame.getContentPane().add(btnStopFactorisation);
 		
@@ -230,7 +235,8 @@ public class MasterGUI {
     	for(BigInteger factor : factorList){
     		contentResult += factor.toString() + " * ";
     	}
-    	contentResult = contentResult.substring(0, contentResult.length()-3);
+    	if (contentResult.length()>3)
+    		contentResult = contentResult.substring(0, contentResult.length()-3);
     	
     	lblDisplayCPUExecutionTime.setText(contentCPUTime);
     	lblDisplayExecutionTime.setText(contentTime);
