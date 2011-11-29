@@ -3,6 +3,7 @@ package worker;
 import static akka.actor.Actors.remote;
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
+
 import javax.swing.JOptionPane;
 
 public class Worker extends UntypedActor {
@@ -69,6 +70,5 @@ public class Worker extends UntypedActor {
 				"Choose Port :", "Launcher StartUp",
 				JOptionPane.QUESTION_MESSAGE));
 		remote().start("localhost", port);
-
 	}
 }
